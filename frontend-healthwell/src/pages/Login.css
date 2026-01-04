@@ -1,0 +1,116 @@
+/* src/pages/Login.css */
+
+/* ล้างค่าเริ่มต้นให้หมดก่อน */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100%;
+  overflow-x: hidden; /* กันเลื่อนซ้ายขวา */
+}
+
+/* Container หลัก: บังคับเต็มจอทุก device */
+.login-container {
+  width: 100vw;
+  min-height: 100vh;      /* สำหรับ Browser ทั่วไป */
+  min-height: 100dvh;     /* 👈 ทีเด็ด! แก้ปัญหา Mobile Address Bar บัง */
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  
+  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  padding: 20px; /* กันการ์ดชิดขอบจอมือถือเกินไป */
+}
+
+/* ตัวการ์ด Login */
+.login-card {
+  background: rgba(255, 255, 255, 0.95); /* โปร่งแสงนิดๆ ดู Modern */
+  backdrop-filter: blur(10px); /* เอฟเฟกต์กระจกฝ้า */
+  
+  width: 100%;           /* บนมือถือให้กว้างเต็ม */
+  max-width: 400px;      /* บนคอมล็อคไว้ไม่ให้ใหญ่เกิน */
+  
+  padding: 40px;
+  border-radius: 24px;   /* มุมมนๆ */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease;
+}
+
+/* Responsive: ถ้าจอเล็ก (มือถือ) ให้ลด padding ลงหน่อยจะได้มีพื้นที่ */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 20px; /* ลดขอบลง */
+    border-radius: 20px;
+  }
+  
+  .login-title {
+    font-size: 1.5rem; /* ลดขนาดตัวหนังสือหัวข้อ */
+  }
+}
+
+/* --- Style ของ Element ข้างใน --- */
+.header { margin-bottom: 30px; display: flex; flex-direction: column; align-items: center; }
+
+.logo-circle {
+  width: 64px; height: 64px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%);
+  border-radius: 50%;
+  display: flex; justify-content: center; align-items: center;
+  margin-bottom: 15px;
+  box-shadow: 0 8px 16px rgba(37, 99, 235, 0.25);
+}
+
+.login-title { font-size: 1.75rem; font-weight: 700; color: #1e293b; margin-bottom: 5px; }
+.login-subtitle { color: #64748b; font-size: 0.9rem; }
+
+.form-group { margin-bottom: 20px; text-align: left; }
+.form-label { display: block; margin-bottom: 8px; color: #475569; font-weight: 500; font-size: 0.9rem; }
+
+.input-wrapper { position: relative; display: flex; align-items: center; }
+
+.custom-input {
+  width: 100%;
+  padding: 12px 45px; /* เว้นที่ให้ไอคอน */
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.2s;
+  background: #f8fafc;
+}
+
+.custom-input:focus {
+  border-color: #3b82f6;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.input-icon { position: absolute; left: 15px; color: #94a3b8; }
+.toggle-password { position: absolute; right: 15px; background: none; border: none; cursor: pointer; color: #94a3b8; display: flex; align-items: center;}
+.toggle-password:hover { color: #475569; }
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(to right, #2563eb, #0ea5e9);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3); }
+.login-btn:active { transform: translateY(0); }
+.login-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+
+.footer-text { margin-top: 25px; color: #94a3b8; font-size: 0.8rem; }

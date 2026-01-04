@@ -1,0 +1,92 @@
+/* src/pages/Dashboard.css */
+
+.dashboard-container {
+  /* 1. กินพื้นที่เต็มจอ */
+  min-height: 100vh;
+  width: 100%;
+  
+  /* 2. สีพื้นหลัง */
+  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+  
+  /* 3. ใช้ Flexbox จัดกึ่งกลาง */
+  display: flex;
+  
+  /* 👉 แนวนอน: สั่งให้อยู่ตรงกลาง (ซ้าย-ขวา) */
+  justify-content: center; 
+  
+  /* 👉 แนวตั้ง: สั่งให้เริ่มจาก "บนสุด" (ห้ามใช้ center เด็ดขาด!) */
+  align-items: flex-start; 
+  
+  /* 4. เว้นระยะจากขอบบนลงมา 60px (จะได้เหมือนลอยอยู่ตรงกลาง แต่ไม่ติดขอบบน) */
+  padding-top: 60px;
+  
+  /* เว้นขอบอื่นๆ กันตกจอ */
+  padding-bottom: 60px;
+  padding-left: 20px;
+  padding-right: 20px;
+  
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboard-card {
+  /* ขนาดการ์ด */
+  width: 100%;
+  max-width: 1000px; /* ความกว้างสูงสุด */
+  
+  /* ความสวยงาม */
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  
+  /* Animation */
+  animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- ส่วน CSS ย่อยๆ ด้านล่างเหมือนเดิมครับ ก๊อปของเก่ามาแปะต่อท้ายได้เลย --- */
+
+.dashboard-header {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px;
+  flex-wrap: wrap; gap: 15px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 40px; align-items: start;
+}
+
+/* ... (CSS Form, Table, Button ที่เหลือใช้ของเดิมได้เลยครับ) ... */
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 8px; color: #475569; font-weight: 500; font-size: 0.9rem; }
+.form-input, .form-select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff; box-sizing: border-box; }
+.primary-btn { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+.logout-btn { display: flex; align-items: center; gap: 6px; background: #fee2e2; color: #ef4444; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+.table-container { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 12px; }
+.styled-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+.styled-table th { background: #f8fafc; padding: 12px; text-align: left; color: #475569; font-weight: 600; }
+.styled-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
+.badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+.badge.pending { background: #ffedd5; color: #c2410c; }
+.badge.confirmed { background: #dcfce7; color: #15803d; }
+.badge.cancelled { background: #fee2e2; color: #b91c1c; }
+.action-btn { border: none; padding: 6px; border-radius: 6px; cursor: pointer; margin-right: 4px; display: inline-flex; }
+.btn-approve { background: #dcfce7; color: #15803d; }
+.btn-cancel { background: #ffedd5; color: #c2410c; }
+.btn-delete { background: #fee2e2; color: #b91c1c; }
+
+@media (max-width: 768px) {
+  .dashboard-container { padding: 20px 10px; }
+  .dashboard-card { padding: 20px; }
+  .dashboard-header { flex-direction: column; align-items: flex-start; }
+  .logout-btn { width: 100%; justify-content: center; }
+  .dashboard-grid { grid-template-columns: 1fr; gap: 30px; }
+}
