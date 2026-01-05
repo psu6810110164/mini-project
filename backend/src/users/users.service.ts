@@ -13,7 +13,7 @@ export class UsersService implements OnModuleInit {
   ) { }
 
   async onModuleInit() {
-    const adminUsername = '9999999999999'; // เลขบัตรสมมติของ Admin (13 หลัก)
+    const adminUsername = '9999999999999';
     const adminExists = await this.userRepository.findOneBy({ username: adminUsername });
 
     if (!adminExists) {
@@ -21,10 +21,10 @@ export class UsersService implements OnModuleInit {
 
       const admin = this.userRepository.create({
         username: adminUsername,
-        password: await bcrypt.hash('admin1234', 10), // รหัสผ่านของ Admin
+        password: await bcrypt.hash('admin1234', 10), 
         firstName: 'Super',
         lastName: 'Admin',
-        role: UserRole.ADMIN, // 👈 สำคัญ! ยัดยศ Admin ให้เลย
+        role: UserRole.ADMIN,
       });
 
       await this.userRepository.save(admin);

@@ -12,7 +12,10 @@ export class Appointment {
   @Column()
   date: string;
 
-  @Column({ default: 'pending' })
+  @Column()
+  symptom: string;
+
+  @Column({ default: 'confirmed' })
   status: string;
 
   @ManyToOne(() => User, (user) => user.appointments, {

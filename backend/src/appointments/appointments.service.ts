@@ -11,39 +11,46 @@ export class AppointmentsService {
   ) {}
 
   async create(createDto: any, userId: number) {
+    // 1. เช็คว่าหมอคิวเต็มหรือยังในเวลานั้น (กันชนกัน)
     const existingAppointment = await this.appointmentRepository.findOne({
       where: {
         doctorName: createDto.doctorName,
         date: createDto.date,
-        status: Not('cancelled'),
+        status: Not('cancelled'), // ถ้ามีนัดแล้ว และยังไม่ยกเลิก ถือว่าซ้ำ
       },
     });
 
     if (existingAppointment) {
       throw new ConflictException(
-        `เสียใจด้วยครับ! คุณหมอ ${createDto.doctorName} มีคิวในเวลา ${createDto.date} แล้ว (สถานะ: ${existingAppointment.status})`,
+        `เสียใจด้วยครับ! คุณหมอ ${createDto.doctorName} มีคิวในเวลา ${createDto.date} แล้ว`,
       );
     }
 
+    // 2. สร้างข้อมูลลง Database
+    // แนะนำให้ระบุทีละตัวแบบนี้ จะชัวร์กว่าการใช้ ...createDto
     const appointment = this.appointmentRepository.create({
-      ...createDto,
-      status: 'pending',
-      user: { id: userId },
+      doctorName: createDto.doctorName,
+      date: createDto.date,
+      symptom: createDto.symptom, // ✅ บรรทัดสำคัญ! สั่งให้บันทึกอาการลงไปด้วย
+      status: 'confirmed',
+      user: { id: userId }, // ผูกกับ User ที่ล็อกอินอยู่
     });
+
     return this.appointmentRepository.save(appointment);
   }
 
   async findByUser(userId: number) {
     return this.appointmentRepository.find({
-      where: { user: { id: userId } }, 
-      order: { date: 'DESC' }, 
-      relations: ['user'], 
+      where: { user: { id: userId } },
+      order: { date: 'DESC' }, // เรียงจากวันที่ล่าสุดไปเก่า
+      relations: ['user'],
     });
   }
 
   async findAll() {
     return this.appointmentRepository.find({
-      relations: ['user'],
+      order: { date: 'DESC' }, // Admin ควรเห็นล่าสุดก่อน
+      relations: ['user'], // ดึงข้อมูล User (ชื่อ, เลขบัตร) มาแสดงด้วย
     });
   }
 
@@ -57,6 +64,7 @@ export class AppointmentsService {
   }
 
   async update(id: number, updateDto: any) {
+    // ใช้ preload หรือ update ก็ได้ แต่ update จะเร็วกว่าสำหรับเคสง่ายๆ
     await this.appointmentRepository.update(id, updateDto);
     return this.findOne(id);
   }

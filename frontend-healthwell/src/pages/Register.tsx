@@ -74,24 +74,23 @@ export default function Register() {
           </div>
 
           {/* 2. ชื่อ - นามสกุล */}
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
-            <div className="form-group">
-              <label className="form-label">ชื่อจริง</label>
-              <input 
-                type="text" className="custom-input" placeholder="ไม่ต้องใส่คำนำหน้า"
-                style={{ paddingLeft: '15px' }} // ปรับ padding เพราะไม่มีไอคอน
-                value={firstName} onChange={e => setFirstName(e.target.value)} required
-              />
-            </div>
-            <div className="form-group">
-              <label className="form-label">นามสกุล</label>
-              <input 
-                type="text" className="custom-input" placeholder="นามสกุล"
-                style={{ paddingLeft: '15px' }}
-                value={lastName} onChange={e => setLastName(e.target.value)} required
-              />
-            </div>
+          <div className="form-group">
+            <label className="form-label">ชื่อจริง</label>
+            <input 
+              type="text" className="custom-input" placeholder="ไม่ต้องใส่คำนำหน้า"
+              style={{ paddingLeft: '15px' }} // ปรับ padding เพราะไม่มีไอคอน
+              value={firstName} onChange={e => setFirstName(e.target.value)} required
+            />
           </div>
+          <div className="form-group">
+            <label className="form-label">นามสกุล</label>
+            <input 
+              type="text" className="custom-input" placeholder="นามสกุล"
+              style={{ paddingLeft: '15px' }}
+              value={lastName} onChange={e => setLastName(e.target.value)} required
+            />
+          </div>
+          
 
           {/* 3. รหัสผ่าน (พร้อมปุ่มลูกตา 👁️) */}
           <div className="form-group">

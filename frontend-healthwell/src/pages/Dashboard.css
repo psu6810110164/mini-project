@@ -1,92 +1,158 @@
 /* src/pages/Dashboard.css */
 
+/* --- 1. ฉากหลัง & การจัดกลาง --- */
 .dashboard-container {
-  /* 1. กินพื้นที่เต็มจอ */
   min-height: 100vh;
   width: 100%;
-  
-  /* 2. สีพื้นหลัง */
-  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
-  
-  /* 3. ใช้ Flexbox จัดกึ่งกลาง */
   display: flex;
-  
-  /* 👉 แนวนอน: สั่งให้อยู่ตรงกลาง (ซ้าย-ขวา) */
-  justify-content: center; 
-  
-  /* 👉 แนวตั้ง: สั่งให้เริ่มจาก "บนสุด" (ห้ามใช้ center เด็ดขาด!) */
-  align-items: flex-start; 
-  
-  /* 4. เว้นระยะจากขอบบนลงมา 60px (จะได้เหมือนลอยอยู่ตรงกลาง แต่ไม่ติดขอบบน) */
-  padding-top: 60px;
-  
-  /* เว้นขอบอื่นๆ กันตกจอ */
-  padding-bottom: 60px;
-  padding-left: 20px;
-  padding-right: 20px;
-  
-  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
   font-family: 'Inter', sans-serif;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
+/* --- 2. ตัวการ์ด --- */
 .dashboard-card {
-  /* ขนาดการ์ด */
   width: 100%;
-  max-width: 1000px; /* ความกว้างสูงสุด */
-  
-  /* ความสวยงาม */
-  background: rgba(255, 255, 255, 0.95);
+  max-width: 550px;
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(10px);
   padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 0.5s ease-out;
   
-  /* Animation */
-  animation: slideDown 0.5s ease-out;
+  /* เพิ่ม flex column เพื่อจัดปุ่ม logout ไว้ล่างสุดง่ายๆ */
+  display: flex;
+  flex-direction: column;
 }
 
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-20px); }
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- ส่วน CSS ย่อยๆ ด้านล่างเหมือนเดิมครับ ก๊อปของเก่ามาแปะต่อท้ายได้เลย --- */
-
+/* --- 3. ส่วนหัว (Header) --- */
 .dashboard-header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 30px; border-bottom: 1px solid #e2e8f0; padding-bottom: 20px;
-  flex-wrap: wrap; gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
 }
 
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 40px; align-items: start;
+/* --- 4. หัวข้อ (Titles) --- */
+.section-title {
+  text-align: left;
+  margin-bottom: 15px;
+  color: #334155;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.1rem;
 }
 
-/* ... (CSS Form, Table, Button ที่เหลือใช้ของเดิมได้เลยครับ) ... */
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 8px; color: #475569; font-weight: 500; font-size: 0.9rem; }
-.form-input, .form-select { width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; background: #fff; box-sizing: border-box; }
-.primary-btn { width: 100%; padding: 12px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; margin-top: 10px; }
-.logout-btn { display: flex; align-items: center; gap: 6px; background: #fee2e2; color: #ef4444; border: none; padding: 8px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-.table-container { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 12px; }
-.styled-table { width: 100%; border-collapse: collapse; min-width: 600px; }
-.styled-table th { background: #f8fafc; padding: 12px; text-align: left; color: #475569; font-weight: 600; }
-.styled-table td { padding: 12px; border-bottom: 1px solid #f1f5f9; color: #334155; }
-.badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+/* --- 5. ฟอร์มและกล่อง Input --- */
+.form-group {
+  width: 100%;
+  /* ✅ แก้ไข 1: ขยายความกว้างให้เต็มพื้นที่การ์ด (ลบ max-width 400px ออก) */
+  max-width: 100%; 
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #475569;
+  font-weight: 600;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.form-input, .form-select {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 1rem;
+  background: #f8fafc;
+  box-sizing: border-box;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.form-input:focus, .form-select:focus {
+  border-color: #3b82f6;
+  background: #fff;
+  outline: none;
+}
+
+textarea.form-input { resize: none; }
+
+/* --- 6. ปุ่มยืนยัน (Confirm Button) --- */
+.primary-btn {
+  width: 100%;
+  /* ✅ แก้ไข 1: ขยายปุ่มให้เต็มเหมือนกัน */
+  max-width: 100%; 
+  display: block;
+  margin-top: 25px;
+  padding: 14px;
+  background: linear-gradient(to right, #3b82f6, #2563eb);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+.primary-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+}
+
+/* --- 7. ส่วนประวัติ (History Section) --- */
+.history-section {
+  /* ✅ แก้ไข 2: เพิ่มระยะห่างด้านบนให้เยอะขึ้น (จากเดิมมันชิดปุ่มเกินไป) */
+  margin-top: 50px; 
+  
+  border-top: 1px solid #e2e8f0; /* เพิ่มเส้นคั่นบางๆ ให้ดูแบ่งส่วนชัดเจน */
+  padding-top: 30px;
+}
+
+.table-container {
+  width: 100%;
+  max-width: 100%; /* ให้เต็มพื้นที่ */
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.styled-table { width: 100%; border-collapse: collapse; }
+.styled-table th, .styled-table td {
+  padding: 12px; text-align: left; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; color: #334155;
+}
+.styled-table th { background: #f8fafc; font-weight: 700; color: #475569; }
+.badge { padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; display: inline-block; }
 .badge.pending { background: #ffedd5; color: #c2410c; }
 .badge.confirmed { background: #dcfce7; color: #15803d; }
 .badge.cancelled { background: #fee2e2; color: #b91c1c; }
-.action-btn { border: none; padding: 6px; border-radius: 6px; cursor: pointer; margin-right: 4px; display: inline-flex; }
-.btn-approve { background: #dcfce7; color: #15803d; }
-.btn-cancel { background: #ffedd5; color: #c2410c; }
-.btn-delete { background: #fee2e2; color: #b91c1c; }
 
-@media (max-width: 768px) {
-  .dashboard-container { padding: 20px 10px; }
-  .dashboard-card { padding: 20px; }
-  .dashboard-header { flex-direction: column; align-items: flex-start; }
-  .logout-btn { width: 100%; justify-content: center; }
-  .dashboard-grid { grid-template-columns: 1fr; gap: 30px; }
+/* --- 8. ปุ่ม Logout (ย้ายมาล่างสุด) --- */
+.logout-container {
+  /* ✅ แก้ไข 3: จัดระยะห่างด้านบน */
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px dashed #e2e8f0;
+  display: flex;
+  justify-content: center;
 }
+
+.logout-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: #fff; color: #ef4444; border: 1px solid #fee2e2;
+  padding: 10px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  width: auto;
+}
+.logout-btn:hover { background: #fee2e2; transform: translateY(-2px); }
