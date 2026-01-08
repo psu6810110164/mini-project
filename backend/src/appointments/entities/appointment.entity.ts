@@ -9,8 +9,8 @@ export class Appointment {
   @Column()
   doctorName: string;
 
-  @Column()
-  date: string;
+  @Column({ type: 'timestamp' })
+  date: Date;
 
   @Column()
   symptom: string;

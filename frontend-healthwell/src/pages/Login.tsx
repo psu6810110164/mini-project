@@ -5,7 +5,7 @@ import { Eye, EyeOff, User, Lock, Activity } from 'lucide-react';
 import './Login.css';
 
 export default function Login() {
-  const [username, setUsername] = useState(''); // ใช้เก็บเลขบัตรประชาชน
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -15,7 +15,6 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      // simulate loading
       await new Promise(r => setTimeout(r, 800)); 
 
       const response = await api.post('/auth/login', { username, password });

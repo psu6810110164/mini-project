@@ -8,3 +8,5 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: password123
       POSTGRES_DB: healthwell_db
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data

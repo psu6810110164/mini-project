@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '../api/axios';
-// 👇 เพิ่ม import Eye, EyeOff เข้ามาด้วย
+// เพิ่ม import Eye, EyeOff เข้ามาด้วย
 import { User, Lock, UserPlus, Eye, EyeOff } from 'lucide-react';
 import './Login.css'; // ใช้ CSS เดิม สวยเหมือนกันเป๊ะ
 
@@ -11,7 +11,7 @@ export default function Register() {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   
-  // 👇 เพิ่ม State สำหรับสลับดูรหัสผ่าน
+  // เพิ่ม State สำหรับสลับดูรหัสผ่าน
   const [showPassword, setShowPassword] = useState(false);
   
   const [loading, setLoading] = useState(false);
@@ -33,7 +33,6 @@ export default function Register() {
         firstName,
         lastName
       });
-      alert('✅ สมัครสมาชิกสำเร็จ! กรุณาเข้าสู่ระบบ'); 
       navigate('/');
     } catch (error) {
       alert('❌ สมัครไม่ผ่าน: เลขบัตรนี้อาจมีในระบบแล้ว');
@@ -98,7 +97,7 @@ export default function Register() {
             <div className="input-wrapper">
               <Lock size={20} className="input-icon" />
               <input 
-                // 👇 สลับ type ตาม state showPassword
+                // สลับ type ตาม state showPassword
                 type={showPassword ? "text" : "password"} 
                 className="custom-input"
                 placeholder="ตั้งรหัสผ่านของคุณ" 
@@ -107,7 +106,7 @@ export default function Register() {
                 required
               />
               
-              {/* 👇 ปุ่มกดสลับ */}
+              {/* ปุ่มกดสลับ */}
               <button
                 type="button"
                 className="toggle-password"

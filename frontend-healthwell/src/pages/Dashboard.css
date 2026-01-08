@@ -1,6 +1,6 @@
 /* src/pages/Dashboard.css */
 
-/* --- 1. ฉากหลัง & การจัดกลาง --- */
+/* ---  ฉากหลัง & การจัดกลาง --- */
 .dashboard-container {
   min-height: 100vh;
   width: 100%;
@@ -13,7 +13,7 @@
   box-sizing: border-box;
 }
 
-/* --- 2. ตัวการ์ด --- */
+/* ---  ตัวการ์ด --- */
 .dashboard-card {
   width: 100%;
   max-width: 550px;
@@ -24,7 +24,6 @@
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.1);
   animation: fadeInUp 0.5s ease-out;
   
-  /* เพิ่ม flex column เพื่อจัดปุ่ม logout ไว้ล่างสุดง่ายๆ */
   display: flex;
   flex-direction: column;
 }
@@ -34,14 +33,14 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- 3. ส่วนหัว (Header) --- */
+/* ---  ส่วนหัว (Header) --- */
 .dashboard-header {
   margin-bottom: 20px;
   padding-bottom: 20px;
   border-bottom: 1px solid #e2e8f0;
 }
 
-/* --- 4. หัวข้อ (Titles) --- */
+/* ---  หัวข้อ (Titles) --- */
 .section-title {
   text-align: left;
   margin-bottom: 15px;
@@ -53,10 +52,9 @@
   font-size: 1.1rem;
 }
 
-/* --- 5. ฟอร์มและกล่อง Input --- */
+/* ---  ฟอร์มและกล่อง Input --- */
 .form-group {
   width: 100%;
-  /* ✅ แก้ไข 1: ขยายความกว้างให้เต็มพื้นที่การ์ด (ลบ max-width 400px ออก) */
   max-width: 100%; 
   margin-bottom: 20px;
 }
@@ -90,10 +88,9 @@
 
 textarea.form-input { resize: none; }
 
-/* --- 6. ปุ่มยืนยัน (Confirm Button) --- */
+/* ---  ปุ่มยืนยัน (Confirm Button) --- */
 .primary-btn {
   width: 100%;
-  /* ✅ แก้ไข 1: ขยายปุ่มให้เต็มเหมือนกัน */
   max-width: 100%; 
   display: block;
   margin-top: 25px;
@@ -112,18 +109,17 @@ textarea.form-input { resize: none; }
   box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
 }
 
-/* --- 7. ส่วนประวัติ (History Section) --- */
+/* --- ส่วนประวัติ (History Section) --- */
 .history-section {
-  /* ✅ แก้ไข 2: เพิ่มระยะห่างด้านบนให้เยอะขึ้น (จากเดิมมันชิดปุ่มเกินไป) */
   margin-top: 50px; 
   
-  border-top: 1px solid #e2e8f0; /* เพิ่มเส้นคั่นบางๆ ให้ดูแบ่งส่วนชัดเจน */
+  border-top: 1px solid #e2e8f0;
   padding-top: 30px;
 }
 
 .table-container {
   width: 100%;
-  max-width: 100%; /* ให้เต็มพื้นที่ */
+  max-width: 100%;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   overflow: hidden;
@@ -139,9 +135,8 @@ textarea.form-input { resize: none; }
 .badge.confirmed { background: #dcfce7; color: #15803d; }
 .badge.cancelled { background: #fee2e2; color: #b91c1c; }
 
-/* --- 8. ปุ่ม Logout (ย้ายมาล่างสุด) --- */
+/* ---  ปุ่ม Logout  --- */
 .logout-container {
-  /* ✅ แก้ไข 3: จัดระยะห่างด้านบน */
   margin-top: 40px;
   padding-top: 20px;
   border-top: 1px dashed #e2e8f0;

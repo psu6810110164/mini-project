@@ -33,11 +33,10 @@ export default function AdminDashboard() {
 
   const handleLogout = () => { localStorage.clear(); navigate('/'); };
 
-  // ✅ แก้ระบบค้นหา ให้เจาะเข้าไปหาใน object user
   const filteredAppointments = appointments.filter(app => {
-    const user = app.user || {}; // กัน error ถ้า user เป็น null
+    const user = app.user || {}; 
     const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
-    const cardId = (user.username || user.cardId || '').toLowerCase(); // ใช้ username แทน cardId ตามที่ตั้งไว้
+    const cardId = (user.username || user.cardId || '').toLowerCase(); 
     const doctor = (app.doctorName || '').toLowerCase();
     const search = searchTerm.toLowerCase();
 
@@ -109,7 +108,7 @@ export default function AdminDashboard() {
                       
                       <td style={{ textAlign: 'center' }}>
                         {deleteId === item.id ? (
-                          <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+                          <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
                             <button onClick={() => confirmDelete(item.id)} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}>ลบ!</button>
                             <button onClick={() => setDeleteId(null)} style={{ background: '#e2e8f0', color: '#64748b', border: 'none', padding: '6px', borderRadius: '6px', cursor: 'pointer' }}><XCircle size={16} /></button>
                           </div>
