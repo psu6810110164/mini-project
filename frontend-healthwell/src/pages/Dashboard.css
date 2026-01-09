@@ -151,3 +151,44 @@ textarea.form-input { resize: none; }
   width: auto;
 }
 .logout-btn:hover { background: #fee2e2; transform: translateY(-2px); }
+
+.time-slot-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* แบ่งเป็น 4 แถว */
+  gap: 20px;  /* ✅ ระยะห่างระหว่างปุ่ม (ปรับตรงนี้) */
+  margin-top: 15px;
+  margin-bottom: 25px;
+}
+
+/* ปุ่มเวลาปกติ */
+.time-slot-btn {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+/* ปุ่มเวลาตอนเอาเมาส์ไปชี้ */
+.time-slot-btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.time-slot-btn.selected {
+  background-color: #3b82f6 !important;
+  color: white !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3);
+}
+
+/* ปุ่มที่ถูกล็อค (เต็ม/เลือกไม่ได้) */
+.time-slot-btn:disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+}

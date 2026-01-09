@@ -43,7 +43,7 @@ export default function Register() {
 
   return (
     <div className="login-container">
-      <div className="login-card">
+      <div className="login-card" style={{ maxWidth: '800px', width: '70%', minHeight: '90vh' }}>
         {/* Header */}
         <div className="header">
           {/* โลโก้สีเขียว Emerald */}

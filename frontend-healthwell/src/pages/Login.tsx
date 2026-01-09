@@ -21,6 +21,7 @@ export default function Login() {
       
       localStorage.setItem('token', response.data.access_token);
       localStorage.setItem('role', response.data.role);
+      localStorage.setItem('userId', response.data.userId);
       localStorage.setItem('username', response.data.username);
       localStorage.setItem('firstName', response.data.firstName);
       localStorage.setItem('lastName', response.data.lastName || '');
@@ -40,7 +41,7 @@ export default function Login() {
 
   return (
     <div className="login-container">
-      <div className="login-card">
+      <div className="login-card" style={{ maxWidth: '800px', width: '70%', minHeight: '90vh' }}>
         {/* Header Section */}
         <div className="header">
           <div className="logo-circle">
@@ -97,7 +98,7 @@ export default function Login() {
           </button>
         </form>
 
-        {/* 👇 ส่วนปุ่มสมัครสมาชิก (Register Link) อยู่ตรงนี้ครับ */}
+        {/* ส่วนปุ่มสมัครสมาชิก (Register Link) อยู่ตรงนี้ครับ */}
         <div style={{ marginTop: '20px', borderTop: '1px solid #e2e8f0', paddingTop: '15px' }}>
           <p className="footer-text" style={{ fontSize: '0.9rem', marginBottom: '5px' }}>
             ยังไม่มีบัญชีใช่ไหม?

@@ -9,13 +9,15 @@ export class AppointmentsController {
   constructor(private readonly appointmentsService: AppointmentsService) {}
 
   @Post()
-  create(@Body() createAppointmentDto: CreateAppointmentDto, @Request() req) {
-    // ใส่ user id หรือแก้ตาม logic เดิมของคุณ
-    const userId = req.user ? req.user.id : 1; // แก้ขัดไปก่อนถ้ายังไม่ได้ทำ auth จริงจัง
+  create(
+    @Body() createAppointmentDto: CreateAppointmentDto, 
+    @Body('userId') userIdFromBody: string, 
+    @Request() req
+  ) {
+    const userId = userIdFromBody ? parseInt(userIdFromBody) : (req.user ? req.user.id : 1);
     return this.appointmentsService.create(createAppointmentDto, userId);
   }
 
-  // 👇👇 จุดสำคัญ! ต้องมีอันนี้ หน้าเว็บถึงจะดึงเวลาได้ 👇👇
   @Get('check-availability')
   async checkAvailability(
     @Query('doctorName') doctorName: string,
@@ -24,12 +26,11 @@ export class AppointmentsController {
     console.log('มีการเรียกเช็คเวลา:', doctorName, date); // ✅ ใส่ log ให้ดูว่า Frontend ยิงมาถึงไหม
     return this.appointmentsService.checkAvailability(doctorName, date);
   }
-  // 👆👆 ------------------------------------------ 👆👆
 
   @Get('my-history')
-  findByUser(@Request() req) {
-    const userId = req.user ? req.user.id : 1; 
-    return this.appointmentsService.findByUser(userId);
+  async findByUser(@Query('userId') userId: string) { // 👈 รับค่า userId จากหน้าบ้าน
+    const id = userId ? parseInt(userId) : 1;
+    return this.appointmentsService.findByUser(id);
   }
 
   @Get()

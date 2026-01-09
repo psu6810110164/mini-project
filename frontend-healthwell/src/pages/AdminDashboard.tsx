@@ -45,7 +45,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-card">
+      <div className="dashboard-card" style={{ maxWidth: '1100px', width: '90%', minHeight: '90vh' }}>
 
         {/* --- Header --- */}
         <div className="dashboard-header" style={{ paddingBottom: '0', borderBottom: 'none' }}>
