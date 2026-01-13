@@ -12,4 +12,8 @@ export class CreateAppointmentDto {
   @IsString()
   @IsNotEmpty()
   symptom: string;
+
+  @IsNotEmpty()
+  userId: number;
+  
 }

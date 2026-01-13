@@ -65,8 +65,8 @@ export default function UserDashboard() {
   // ✅ 5. ระบุ Type ให้ Arguments ของ Function อย่างชัดเจน
   // setSlotFn รับฟังก์ชันสำหรับเปลี่ยน State ของ TimeSlot[]
   const fetchTimeSlots = async (
-    doc: string, 
-    date: string, 
+    doc: string,
+    date: string,
     setSlotFn: React.Dispatch<React.SetStateAction<TimeSlot[]>>
   ) => {
     try {
@@ -92,9 +92,9 @@ export default function UserDashboard() {
       await api.post('/appointments', { doctorName, date: finalDate, symptom, userId: myId });
       fetchHistory();
       setSymptom(''); setSelectedDate(''); setSelectedTime(''); setTimeSlots([]);
-    } catch (error: any) { 
-        // ใช้ any กับ error ใน catch block ถือเป็นข้อยกเว้นที่ยอมรับได้ในระดับนี้
-        alert('⚠️ จองไม่สำเร็จ: ' + (error.response?.data?.message || 'Error')); 
+    } catch (error: any) {
+      // ใช้ any กับ error ใน catch block ถือเป็นข้อยกเว้นที่ยอมรับได้ในระดับนี้
+      alert('⚠️ จองไม่สำเร็จ: ' + (error.response?.data?.message || 'Error'));
     }
   };
 
@@ -174,15 +174,45 @@ export default function UserDashboard() {
             {selectedDate && (
               <div className="form-group">
                 <label>เลือกเวลาที่ว่าง ({timeSlots.filter(t => t.available).length} คิวว่าง)</label>
-                <div className="time-slot-container">
-                  {timeSlots.map((slot) => (
-                    <button type="button" key={slot.time} disabled={!slot.available}
-                      className={`time-slot-btn ${selectedTime === slot.time ? 'selected' : ''}`}
-                      onClick={() => setSelectedTime(slot.time)}
-                    >
-                      {slot.time}
-                    </button>
-                  ))}
+                <div className="time-slots-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginTop: '10px' }}>
+                  {timeSlots.map((slot) => {
+                    // เช็คสถานะ: ถ้าจองแล้ว (available=false) ให้เป็นจริง
+                    const isTaken = !slot.available;
+                    // เช็คสถานะ: ถ้าเราเลือกปุ่มนี้อยู่
+                    const isSelected = selectedTime === slot.time;
+
+                    return (
+                      <button
+                        key={slot.time}
+                        // 🛑 1. สั่งปิดปุ่มถ้าจองแล้ว
+                        disabled={isTaken}
+
+                        onClick={() => setSelectedTime(slot.time)}
+
+                        // 🎨 2. จัดการสีปุ่ม (3 สถานะ: จองแล้ว / เลือกอยู่ / ว่างปกติ)
+                        style={{
+                          padding: '10px',
+                          borderRadius: '8px',
+                          border: isTaken ? '1px solid #e2e8f0' : (isSelected ? '1px solid #3b82f6' : '1px solid #cbd5e1'),
+
+                          // พื้นหลัง: จองแล้ว=เทา, เลือก=ฟ้า, ปกติ=ขาว
+                          backgroundColor: isTaken ? '#f1f5f9' : (isSelected ? '#3b82f6' : '#ffffff'),
+
+                          // ตัวหนังสือ: จองแล้ว=เทาอ่อน, เลือก=ขาว, ปกติ=ดำ
+                          color: isTaken ? '#cbd5e1' : (isSelected ? '#ffffff' : '#334155'),
+
+                          // เมาส์: จองแล้ว=ห้ามกด, ปกติ=รูปมือ
+                          cursor: isTaken ? 'not-allowed' : 'pointer',
+
+                          fontWeight: isSelected ? 'bold' : 'normal',
+                          transition: 'all 0.2s',
+
+                        }}
+                      >
+                        {slot.time}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

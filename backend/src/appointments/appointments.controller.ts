@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, Re
 import { AppointmentsService } from './appointments.service';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
 import { UpdateAppointmentDto } from './dto/update-appointment.dto';
-// ถ้ามี Import อื่นๆ เก็บไว้เหมือนเดิมนะครับ
 
 @Controller('appointments')
 export class AppointmentsController {
@@ -11,11 +10,14 @@ export class AppointmentsController {
   @Post()
   create(
     @Body() createAppointmentDto: CreateAppointmentDto, 
-    @Body('userId') userIdFromBody: string, 
+    @Body('userId') userIdFromBody: string, // กรณีส่งแยกมา
     @Request() req
   ) {
     const userId = userIdFromBody ? parseInt(userIdFromBody) : (req.user ? req.user.id : 1);
-    return this.appointmentsService.create(createAppointmentDto, userId);
+    
+    createAppointmentDto.userId = userId;
+
+    return this.appointmentsService.create(createAppointmentDto);
   }
 
   @Get('check-availability')
@@ -23,14 +25,14 @@ export class AppointmentsController {
     @Query('doctorName') doctorName: string,
     @Query('date') date: string,
   ) {
-    console.log('มีการเรียกเช็คเวลา:', doctorName, date); // ✅ ใส่ log ให้ดูว่า Frontend ยิงมาถึงไหม
+    console.log('มีการเรียกเช็คเวลา:', doctorName, date);
     return this.appointmentsService.checkAvailability(doctorName, date);
   }
 
   @Get('my-history')
-  async findByUser(@Query('userId') userId: string) { // 👈 รับค่า userId จากหน้าบ้าน
+  async findByUser(@Query('userId') userId: string) {
     const id = userId ? parseInt(userId) : 1;
-    return this.appointmentsService.findByUser(id);
+    return this.appointmentsService.findMyHistory(id); 
   }
 
   @Get()

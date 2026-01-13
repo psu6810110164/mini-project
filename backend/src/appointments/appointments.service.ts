@@ -1,7 +1,10 @@
-import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not, Between } from 'typeorm'; 
+import { Repository, Between } from 'typeorm'; // 👈 1. เพิ่ม Between มาใช้ค้นหาช่วงเวลา
+import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { UpdateAppointmentDto } from './dto/update-appointment.dto';
 import { Appointment } from './entities/appointment.entity';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class AppointmentsService {
@@ -10,116 +13,101 @@ export class AppointmentsService {
     private appointmentRepository: Repository<Appointment>,
   ) {}
 
-  async create(createDto: any, userId: number) {
-      const existingAppointment = await this.appointmentRepository.findOne({
+  async create(createAppointmentDto: CreateAppointmentDto) {
+    // 🛑 เช็คจองซ้ำ: แปลงเป็น Date Object ให้ชัวร์ก่อนเทียบ
+    const appointmentDate = new Date(createAppointmentDto.date);
+    
+    const existing = await this.appointmentRepository.findOne({
       where: {
-        doctorName: createDto.doctorName,
-        date: createDto.date,
-        status: Not('cancelled'),
-      },
+        doctorName: createAppointmentDto.doctorName,
+        date: appointmentDate // เช็ควันที่และเวลาเดียวกันเป๊ะๆ
+      }
     });
 
-    if (existingAppointment) {
-      throw new ConflictException(
-        `เสียใจด้วยครับ! คุณหมอ ${createDto.doctorName} มีคิวในเวลา ${new Date(createDto.date).toLocaleString()} แล้ว`,
-      );
+    if (existing) {
+      throw new ConflictException('เวลานี้ถูกจองไปแล้วครับ กรุณาเลือกเวลาอื่น');
     }
 
+    // ✅ สร้าง Appointment ใหม่ (แนบ userId ไปด้วย)
     const appointment = this.appointmentRepository.create({
-      doctorName: createDto.doctorName,
-      date: createDto.date,
-      symptom: createDto.symptom,
-      status: 'confirmed',
-      user: { id: userId },
+      ...createAppointmentDto,
+      date: appointmentDate, // บันทึกเป็น Date Object
+      user: { id: +createAppointmentDto.userId } as User
     });
 
     return this.appointmentRepository.save(appointment);
   }
 
-  async findByUser(userId: number) {
-    return this.appointmentRepository.find({
-      where: { user: { id: userId } },
-      order: { date: 'DESC' },
-      relations: ['user'],
-    });
-  }
-
-  async findAll() {
-    return this.appointmentRepository.find({
-      order: { date: 'DESC' },
-      relations: ['user'],
-    });
-  }
-
-  async findOne(id: number) {
-    const appointment = await this.appointmentRepository.findOne({
-      where: { id },
-      relations: ['user'],
-    });
-    if (!appointment) throw new NotFoundException('Appointment not found');
-    return appointment;
-  }
-
-  async update(id: number, updateDto: any) {
-    const oldAppointment = await this.findOne(id);
-    
-    if (updateDto.date || updateDto.doctorName) {
-      const targetDate = updateDto.date || oldAppointment.date;
-      const targetDoctor = updateDto.doctorName || oldAppointment.doctorName;
-
-      const conflict = await this.appointmentRepository.findOne({
-        where: {
-          doctorName: targetDoctor,
-          date: targetDate,
-          status: Not('cancelled'), 
-          id: Not(id), 
-        },
-      });
-
-      if (conflict) {
-        throw new ConflictException(
-          `แก้ไขไม่ได้! หมอ ${targetDoctor} มีคิววันที่ ${new Date(targetDate).toLocaleString()} แล้ว`,
-        );
-      }
-    }
-
-    await this.appointmentRepository.update(id, updateDto);
-    return this.findOne(id);
-  }
-
-  async checkAvailability(doctorName: string, dateString: string) {
-    const searchDate = new Date(dateString);
-    const startOfDay = new Date(searchDate.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(searchDate.setHours(23, 59, 59, 999));
-
-    const appointments = await this.appointmentRepository.find({
-      where: {
-        doctorName: doctorName,
-        date: Between(startOfDay, endOfDay), 
-        status: Not('cancelled'),
-      },
-    });
-
+  // ✅ ฟังก์ชันเช็คเวลาว่าง (หัวใจสำคัญที่ทำให้ปุ่มเวลาขึ้น!)
+  async checkAvailability(doctorName: string, date: string) {
+    // 1. กำหนดเวลาที่ร้านเปิด (Hardcode ไว้ก่อนเพื่อความง่าย)
     const allSlots = [
       '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'
     ];
 
-    const result = allSlots.map(slot => {
-      const isBooked = appointments.some(app => {
-        const appTime = new Date(app.date).getHours();
-        const slotTime = parseInt(slot.split(':')[0]);
-        return appTime === slotTime;
-      });
+    // 2. แปลงวันที่ที่ส่งมา เป็นช่วงเวลา เริ่มต้น-สิ้นสุด ของวันนั้น
+    const searchDate = new Date(date);
+    const startOfDay = new Date(searchDate);
+    startOfDay.setHours(0, 0, 0, 0);
 
-      return { time: slot, available: !isBooked };
+    const endOfDay = new Date(searchDate);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    // 3. ดึงรายการที่ "ถูกจองไปแล้ว" ในวันนั้น
+    const existingAppointments = await this.appointmentRepository.find({
+      where: {
+        doctorName: doctorName,
+        date: Between(startOfDay, endOfDay), // 👈 ใช้ Between ค้นหา
+      }
     });
 
-    return result;
+    // 4. แปลงข้อมูลการจอง ให้เป็น List ของ "เวลาที่ไม่ว่าง" (เช่น ['09:00', '14:00'])
+    const bookedTimes = existingAppointments.map(app => {
+      const appDate = new Date(app.date);
+      // แปลงเป็น HH:mm (เช่น 09:00)
+      return appDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    });
+
+    // 5. วนลูปเช็ค: เวลาไหนไม่อยู่ใน bookedTimes แปลว่า "ว่าง" (available: true)
+    return allSlots.map(time => ({
+      time: time,
+      available: !bookedTimes.includes(time)
+    }));
   }
 
-  async remove(id: number) {
-    const result = await this.appointmentRepository.delete(id);
-    if (result.affected === 0) throw new NotFoundException('Appointment not found');
-    return { deleted: true };
+  async findAll() {
+    return this.appointmentRepository.find({
+      relations: ['user'], // ✅ ดึงข้อมูล User มาโชว์หน้า Admin
+      order: { date: 'DESC' }
+    });
+  }
+
+  async findOne(id: number) {
+    return this.appointmentRepository.findOne({ 
+      where: { id },
+      relations: ['user'] 
+    });
+  }
+
+  // ✅ เปลี่ยนชื่อเป็น findByUser เพื่อให้ตรงกับ Controller ที่เคยแก้
+  async findByUser(userId: number) {
+    return this.appointmentRepository.find({
+      where: { user: { id: userId } },
+      relations: ['user'],
+      order: { date: 'DESC' }
+    });
+  }
+  
+  // (แถม) Alias ไว้กันเหนียว เผื่อ Controller เรียก findMyHistory
+  async findMyHistory(userId: number) {
+    return this.findByUser(userId);
+  }
+
+  update(id: number, updateAppointmentDto: UpdateAppointmentDto) {
+    return this.appointmentRepository.update(id, updateAppointmentDto);
+  }
+
+  remove(id: number) {
+    return this.appointmentRepository.delete(id);
   }
 }
