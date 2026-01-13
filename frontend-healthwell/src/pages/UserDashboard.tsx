@@ -3,25 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { LogOut, Calendar, Clock, User, PlusCircle, Edit2, X, Save } from 'lucide-react';
 import './Dashboard.css';
+import type { Appointment, TimeSlot } from '../interfaces'; // ✅ Import Type ที่สร้างไว้
 
 export default function UserDashboard() {
   const navigate = useNavigate();
-  const [appointments, setAppointments] = useState<any[]>([]);
+  // ✅ 1. ระบุ Type ให้ State แทนการใช้ any[]
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   // --- State สำหรับการ "จองใหม่" ---
   const [doctorName, setDoctorName] = useState('Dr. Strange');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
-  const [timeSlots, setTimeSlots] = useState<any[]>([]);
+  // ✅ 2. ระบุ Type สำหรับ TimeSlot
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [symptom, setSymptom] = useState('');
 
-  // --- State สำหรับ "แก้ไข" (เพิ่มชุดตัวแปรสำหรับ Edit โดยเฉพาะ) ---
+  // --- State สำหรับ "แก้ไข" ---
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  // ✅ 3. ระบุ Type สำหรับ Object ที่กำลังแก้ไข (อาจเป็น null ได้)
+  const [editingItem, setEditingItem] = useState<Appointment | null>(null);
 
-  const [editDate, setEditDate] = useState(''); // วันที่ที่จะแก้
-  const [editTime, setEditTime] = useState(''); // เวลาที่จะแก้
-  const [editSlots, setEditSlots] = useState<any[]>([]); // ตารางเวลาของหน้าแก้ไข
+  const [editDate, setEditDate] = useState('');
+  const [editTime, setEditTime] = useState('');
+  // ✅ 4. ระบุ Type สำหรับ TimeSlot ในโหมดแก้ไข
+  const [editSlots, setEditSlots] = useState<TimeSlot[]>([]);
 
   // User Info
   const firstName = localStorage.getItem('firstName');
@@ -30,7 +35,7 @@ export default function UserDashboard() {
 
   useEffect(() => { fetchHistory(); }, []);
 
-  // 1. Effect สำหรับโหลดเวลาจองใหม่
+  // Effect สำหรับโหลดเวลาจองใหม่
   useEffect(() => {
     if (doctorName && selectedDate) {
       fetchTimeSlots(doctorName, selectedDate, setTimeSlots);
@@ -38,10 +43,9 @@ export default function UserDashboard() {
     }
   }, [doctorName, selectedDate]);
 
-  // 2. ✅ Effect สำหรับโหลดเวลาในหน้า "แก้ไข" (ทำงานแยกกัน)
+  // Effect สำหรับโหลดเวลาในหน้า "แก้ไข"
   useEffect(() => {
     if (editingItem && editDate) {
-      // ใช้หมอคนเดิมของรายการนั้นๆ
       fetchTimeSlots(editingItem.doctorName, editDate, setEditSlots);
       // ถ้าเปลี่ยนวัน ให้เคลียร์เวลาเดิมทิ้ง เพื่อกันงง
       if (editDate !== editingItem.date.split('T')[0]) {
@@ -58,8 +62,13 @@ export default function UserDashboard() {
     } catch (error) { navigate('/'); }
   };
 
-  // ✅ ฟังก์ชันดึงเวลา (ใช้ร่วมกันทั้ง จองใหม่ และ แก้ไข)
-  const fetchTimeSlots = async (doc: string, date: string, setSlotFn: Function) => {
+  // ✅ 5. ระบุ Type ให้ Arguments ของ Function อย่างชัดเจน
+  // setSlotFn รับฟังก์ชันสำหรับเปลี่ยน State ของ TimeSlot[]
+  const fetchTimeSlots = async (
+    doc: string, 
+    date: string, 
+    setSlotFn: React.Dispatch<React.SetStateAction<TimeSlot[]>>
+  ) => {
     try {
       const res = await api.get('/appointments/check-availability', {
         params: { doctorName: doc, date: date }
@@ -83,13 +92,16 @@ export default function UserDashboard() {
       await api.post('/appointments', { doctorName, date: finalDate, symptom, userId: myId });
       fetchHistory();
       setSymptom(''); setSelectedDate(''); setSelectedTime(''); setTimeSlots([]);
-    } catch (error: any) { alert('⚠️ จองไม่สำเร็จ: ' + (error.response?.data?.message || 'Error')); }
+    } catch (error: any) { 
+        // ใช้ any กับ error ใน catch block ถือเป็นข้อยกเว้นที่ยอมรับได้ในระดับนี้
+        alert('⚠️ จองไม่สำเร็จ: ' + (error.response?.data?.message || 'Error')); 
+    }
   };
 
   const handleLogout = () => { localStorage.clear(); navigate('/'); };
 
-  // --- เปิด Modal แก้ไข ---
-  const openEditModal = (item: any) => {
+  // ✅ 6. แก้ item: any เป็น Appointment
+  const openEditModal = (item: Appointment) => {
     setEditingItem(item);
 
     // ดึงวันที่เดิมมาใส่ในช่องเลือก
@@ -217,7 +229,7 @@ export default function UserDashboard() {
         </div>
         <div className="logout-container"><button onClick={handleLogout} className="logout-btn"><LogOut size={18} /> ออกจากระบบ</button></div>
 
-        {/* ✅ Modal แก้ไข (เปลี่ยนใหม่ ให้มีปุ่มกดเวลา) */}
+        {/* ✅ Modal แก้ไข */}
         {isEditModalOpen && editingItem && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
             <div style={{ background: 'white', padding: '30px', borderRadius: '20px', width: '90%', maxWidth: '450px', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
@@ -240,7 +252,6 @@ export default function UserDashboard() {
                 {editDate && (
                   <div style={{ marginTop: '15px' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', color: '#64748b' }}>เลือกเวลา:</label>
-                    {/* --- ก๊อปปี้ไปทับใน Modal แก้ไข (ตรง time-slot-container) --- */}
                     <div className="time-slot-container">
                       {editSlots.map((slot) => {
                         // 1. เช็คว่าเป็นเวลาเดิมของเราไหม

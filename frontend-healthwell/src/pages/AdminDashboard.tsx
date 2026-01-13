@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { LogOut, Shield, Search, Calendar, User, Trash2, XCircle } from 'lucide-react';
 import './Dashboard.css';
+import type { Appointment } from '../interfaces'; // ✅ Import Type มาใช้
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
-  const [appointments, setAppointments] = useState<any[]>([]);
+
+  // ✅ 1. ระบุ Type ให้ State (ห้ามใช้ any[])
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
@@ -14,33 +17,44 @@ export default function AdminDashboard() {
 
   const fetchAppointments = async () => {
     try {
+      // ดึงข้อมูลนัดหมายทั้งหมด (ต้องแน่ใจว่า Backend ส่ง relations: ['user'] มาด้วย)
       const res = await api.get('/appointments');
       setAppointments(res.data);
     } catch (error) {
-      alert('โหลดข้อมูลไม่สำเร็จ'); navigate('/');
+      console.error(error); // log error ไว้ดู
+      alert('โหลดข้อมูลไม่สำเร็จ หรือคุณไม่มีสิทธิ์เข้าถึงหน้านี้'); 
+      navigate('/');
     }
   };
 
   const confirmDelete = async (id: number) => {
     try {
       await api.delete(`/appointments/${id}`);
+      // อัปเดต State ทันทีโดยไม่ต้องโหลดใหม่
       setAppointments(prev => prev.filter(item => item.id !== id));
       setDeleteId(null);
     } catch (error) {
-      alert('ลบไม่สำเร็จ');
+      alert('ลบไม่สำเร็จ อาจเกิดข้อผิดพลาดที่ Server');
     }
   };
 
   const handleLogout = () => { localStorage.clear(); navigate('/'); };
 
+  // ✅ 2. Logic การกรองข้อมูลแบบ Type-Safe
   const filteredAppointments = appointments.filter(app => {
-    const user = app.user || {}; 
-    const fullName = `${user.firstName || ''} ${user.lastName || ''}`.toLowerCase();
-    const cardId = (user.username || user.cardId || '').toLowerCase(); 
+    // ใช้ Optional Chaining (?.) ป้องกัน Error กรณี user เป็น null/undefined
+    const firstName = app.user?.firstName?.toLowerCase() || '';
+    const lastName = app.user?.lastName?.toLowerCase() || '';
+    const username = app.user?.username?.toLowerCase() || '';
+    
+    // รวมชื่อ-นามสกุล
+    const fullName = `${firstName} ${lastName}`;
+    
     const doctor = (app.doctorName || '').toLowerCase();
     const search = searchTerm.toLowerCase();
 
-    return fullName.includes(search) || doctor.includes(search) || cardId.includes(search);
+    // เช็คว่าคำค้นหา ตรงกับ ชื่อ หรือ username หรือ ชื่อหมอ ไหม
+    return fullName.includes(search) || username.includes(search) || doctor.includes(search);
   });
 
   return (
@@ -85,14 +99,15 @@ export default function AdminDashboard() {
                     <tr key={item.id}>
                       <td style={{ textAlign: 'center', color: '#64748b' }}>{index + 1}</td>
                       
-                      {/* ✅ แก้ตรงนี้: ดึงข้อมูลจาก item.user */}
+                      {/* ✅ 3. การแสดงผลแบบ Safe Access */}
                       <td>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                            <span style={{ fontWeight: 'bold', color: '#334155' }}>
+                             {/* ใช้ ?. ป้องกันจอขาวถ้าไม่มี user */}
                              {item.user?.firstName || 'ไม่ระบุชื่อ'} {item.user?.lastName || ''}
                            </span>
                            <span style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                             <User size={12}/> {item.user?.username || item.user?.cardId || '-'}
+                             <User size={12}/> {item.user?.username || '-'}
                            </span>
                         </div>
                       </td>
