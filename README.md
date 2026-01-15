@@ -1,7 +1,7 @@
 # HealthQueue: Medical Check-up Reservation System
 ระบบจองคิวตรวจสุขภาพออนไลน์ (Health Check-up Queue Management System)
 
-สมาชิกในกลุ่ม
+## สมาชิกในกลุ่ม
 6810110164 นางสาวธีริศรา คงลิขิต
 
 ## คำอธิบายโปรเจ็ค (Project Description)
