@@ -3,29 +3,25 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { LogOut, Calendar, Clock, User, PlusCircle, Edit2, X, Save } from 'lucide-react';
 import './Dashboard.css';
-import type { Appointment, TimeSlot } from '../interfaces'; // ✅ Import Type ที่สร้างไว้
+import type { Appointment, TimeSlot } from '../interfaces'; 
 
 export default function UserDashboard() {
   const navigate = useNavigate();
-  // ✅ 1. ระบุ Type ให้ State แทนการใช้ any[]
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
   // --- State สำหรับการ "จองใหม่" ---
   const [doctorName, setDoctorName] = useState('Dr. Strange');
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
-  // ✅ 2. ระบุ Type สำหรับ TimeSlot
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
   const [symptom, setSymptom] = useState('');
 
   // --- State สำหรับ "แก้ไข" ---
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  // ✅ 3. ระบุ Type สำหรับ Object ที่กำลังแก้ไข (อาจเป็น null ได้)
   const [editingItem, setEditingItem] = useState<Appointment | null>(null);
 
   const [editDate, setEditDate] = useState('');
   const [editTime, setEditTime] = useState('');
-  // ✅ 4. ระบุ Type สำหรับ TimeSlot ในโหมดแก้ไข
   const [editSlots, setEditSlots] = useState<TimeSlot[]>([]);
 
   // User Info
@@ -35,7 +31,6 @@ export default function UserDashboard() {
 
   useEffect(() => { fetchHistory(); }, []);
 
-  // Effect สำหรับโหลดเวลาจองใหม่
   useEffect(() => {
     if (doctorName && selectedDate) {
       fetchTimeSlots(doctorName, selectedDate, setTimeSlots);
@@ -43,11 +38,9 @@ export default function UserDashboard() {
     }
   }, [doctorName, selectedDate]);
 
-  // Effect สำหรับโหลดเวลาในหน้า "แก้ไข"
   useEffect(() => {
     if (editingItem && editDate) {
       fetchTimeSlots(editingItem.doctorName, editDate, setEditSlots);
-      // ถ้าเปลี่ยนวัน ให้เคลียร์เวลาเดิมทิ้ง เพื่อกันงง
       if (editDate !== editingItem.date.split('T')[0]) {
         setEditTime('');
       }
@@ -62,8 +55,6 @@ export default function UserDashboard() {
     } catch (error) { navigate('/'); }
   };
 
-  // ✅ 5. ระบุ Type ให้ Arguments ของ Function อย่างชัดเจน
-  // setSlotFn รับฟังก์ชันสำหรับเปลี่ยน State ของ TimeSlot[]
   const fetchTimeSlots = async (
     doc: string,
     date: string,
@@ -93,28 +84,23 @@ export default function UserDashboard() {
       fetchHistory();
       setSymptom(''); setSelectedDate(''); setSelectedTime(''); setTimeSlots([]);
     } catch (error: any) {
-      // ใช้ any กับ error ใน catch block ถือเป็นข้อยกเว้นที่ยอมรับได้ในระดับนี้
       alert('⚠️ จองไม่สำเร็จ: ' + (error.response?.data?.message || 'Error'));
     }
   };
 
   const handleLogout = () => { localStorage.clear(); navigate('/'); };
 
-  // ✅ 6. แก้ item: any เป็น Appointment
   const openEditModal = (item: Appointment) => {
     setEditingItem(item);
-
-    // ดึงวันที่เดิมมาใส่ในช่องเลือก
     const originalDate = new Date(item.date);
-    const dateStr = originalDate.toISOString().split('T')[0]; // YYYY-MM-DD
-    const timeStr = originalDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); // HH:mm
+    const dateStr = originalDate.toISOString().split('T')[0]; 
+    const timeStr = originalDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }); 
 
     setEditDate(dateStr);
-    setEditTime(timeStr); // ตั้งค่าเริ่มต้นเป็นเวลาเดิม
+    setEditTime(timeStr); 
     setIsEditModalOpen(true);
   };
 
-  // --- บันทึกการแก้ไข ---
   const handleSaveEdit = async () => {
     if (!editingItem || !editDate || !editTime) {
       alert('กรุณาเลือกวันและเวลาให้ครบถ้วน'); return;
@@ -138,7 +124,8 @@ export default function UserDashboard() {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-card">
+      {/* แก้ไข style ตรงนี้ให้เหมือนหน้า Login */}
+      <div className="dashboard-card" style={{ maxWidth: '800px', width: '70%', minHeight: '90vh' }}>
 
         {/* Header */}
         <div className="dashboard-header">
@@ -176,37 +163,23 @@ export default function UserDashboard() {
                 <label>เลือกเวลาที่ว่าง ({timeSlots.filter(t => t.available).length} คิวว่าง)</label>
                 <div className="time-slots-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px', marginTop: '10px' }}>
                   {timeSlots.map((slot) => {
-                    // เช็คสถานะ: ถ้าจองแล้ว (available=false) ให้เป็นจริง
                     const isTaken = !slot.available;
-                    // เช็คสถานะ: ถ้าเราเลือกปุ่มนี้อยู่
                     const isSelected = selectedTime === slot.time;
 
                     return (
                       <button
                         key={slot.time}
-                        // 🛑 1. สั่งปิดปุ่มถ้าจองแล้ว
                         disabled={isTaken}
-
                         onClick={() => setSelectedTime(slot.time)}
-
-                        // 🎨 2. จัดการสีปุ่ม (3 สถานะ: จองแล้ว / เลือกอยู่ / ว่างปกติ)
                         style={{
                           padding: '10px',
                           borderRadius: '8px',
                           border: isTaken ? '1px solid #e2e8f0' : (isSelected ? '1px solid #3b82f6' : '1px solid #cbd5e1'),
-
-                          // พื้นหลัง: จองแล้ว=เทา, เลือก=ฟ้า, ปกติ=ขาว
                           backgroundColor: isTaken ? '#f1f5f9' : (isSelected ? '#3b82f6' : '#ffffff'),
-
-                          // ตัวหนังสือ: จองแล้ว=เทาอ่อน, เลือก=ขาว, ปกติ=ดำ
                           color: isTaken ? '#cbd5e1' : (isSelected ? '#ffffff' : '#334155'),
-
-                          // เมาส์: จองแล้ว=ห้ามกด, ปกติ=รูปมือ
                           cursor: isTaken ? 'not-allowed' : 'pointer',
-
                           fontWeight: isSelected ? 'bold' : 'normal',
                           transition: 'all 0.2s',
-
                         }}
                       >
                         {slot.time}
@@ -259,7 +232,6 @@ export default function UserDashboard() {
         </div>
         <div className="logout-container"><button onClick={handleLogout} className="logout-btn"><LogOut size={18} /> ออกจากระบบ</button></div>
 
-        {/* ✅ Modal แก้ไข */}
         {isEditModalOpen && editingItem && (
           <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 999 }}>
             <div style={{ background: 'white', padding: '30px', borderRadius: '20px', width: '90%', maxWidth: '450px', boxShadow: '0 20px 50px rgba(0,0,0,0.2)' }}>
@@ -268,7 +240,6 @@ export default function UserDashboard() {
               <div style={{ marginBottom: '20px' }}>
                 <p style={{ margin: '0 0 10px 0', color: '#64748b' }}>แพทย์: <strong>{editingItem.doctorName}</strong></p>
 
-                {/* 1. เลือกวันที่ใหม่ */}
                 <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>เลือกวันที่ใหม่:</label>
                 <input
                   type="date"
@@ -278,24 +249,20 @@ export default function UserDashboard() {
                   min={new Date().toISOString().split('T')[0]}
                 />
 
-                {/* 2. แสดงปุ่มเวลา (เหมือนหน้าจอง) */}
                 {editDate && (
                   <div style={{ marginTop: '15px' }}>
                     <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.9rem', color: '#64748b' }}>เลือกเวลา:</label>
                     <div className="time-slot-container">
                       {editSlots.map((slot) => {
-                        // 1. เช็คว่าเป็นเวลาเดิมของเราไหม
                         const isMyOwnSlot = (editDate === editingItem.date.split('T')[0]) &&
                           (slot.time === new Date(editingItem.date).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }));
-
-                        // 2. เงื่อนไขห้ามกด: (ถ้าคิวไม่ว่าง) หรือ (เป็นเวลาเดิมของเรา) ให้ล็อคเลย 🔒
                         const isLocked = !slot.available || isMyOwnSlot;
 
                         return (
                           <button
                             type="button"
                             key={slot.time}
-                            disabled={isLocked} // 👈 ใส่ตัวล็อคตรงนี้
+                            disabled={isLocked}
                             className={`time-slot-btn ${editTime === slot.time ? 'selected' : ''}`}
                             onClick={() => setEditTime(slot.time)}
                           >
@@ -304,7 +271,6 @@ export default function UserDashboard() {
                         );
                       })}
                     </div>
-                    {/* ข้อความเตือน */}
                     {editSlots.length > 0 && editSlots.every(t => !t.available) && (
                       <p style={{ color: '#ef4444', textAlign: 'center', fontSize: '0.8rem', marginTop: '5px' }}>❌ เต็ม (กรุณาเลือกวันอื่น)</p>
                     )}

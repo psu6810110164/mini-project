@@ -3,12 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { LogOut, Shield, Search, Calendar, User, Trash2, XCircle } from 'lucide-react';
 import './Dashboard.css';
-import type { Appointment } from '../interfaces'; // ✅ Import Type มาใช้
+import type { Appointment } from '../interfaces';
 
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
-  // ✅ 1. ระบุ Type ให้ State (ห้ามใช้ any[])
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -17,11 +16,10 @@ export default function AdminDashboard() {
 
   const fetchAppointments = async () => {
     try {
-      // ดึงข้อมูลนัดหมายทั้งหมด (ต้องแน่ใจว่า Backend ส่ง relations: ['user'] มาด้วย)
       const res = await api.get('/appointments');
       setAppointments(res.data);
     } catch (error) {
-      console.error(error); // log error ไว้ดู
+      console.error(error); 
       alert('โหลดข้อมูลไม่สำเร็จ หรือคุณไม่มีสิทธิ์เข้าถึงหน้านี้'); 
       navigate('/');
     }
@@ -30,7 +28,6 @@ export default function AdminDashboard() {
   const confirmDelete = async (id: number) => {
     try {
       await api.delete(`/appointments/${id}`);
-      // อัปเดต State ทันทีโดยไม่ต้องโหลดใหม่
       setAppointments(prev => prev.filter(item => item.id !== id));
       setDeleteId(null);
     } catch (error) {
@@ -40,26 +37,23 @@ export default function AdminDashboard() {
 
   const handleLogout = () => { localStorage.clear(); navigate('/'); };
 
-  // ✅ 2. Logic การกรองข้อมูลแบบ Type-Safe
   const filteredAppointments = appointments.filter(app => {
-    // ใช้ Optional Chaining (?.) ป้องกัน Error กรณี user เป็น null/undefined
     const firstName = app.user?.firstName?.toLowerCase() || '';
     const lastName = app.user?.lastName?.toLowerCase() || '';
     const username = app.user?.username?.toLowerCase() || '';
     
-    // รวมชื่อ-นามสกุล
     const fullName = `${firstName} ${lastName}`;
     
     const doctor = (app.doctorName || '').toLowerCase();
     const search = searchTerm.toLowerCase();
 
-    // เช็คว่าคำค้นหา ตรงกับ ชื่อ หรือ username หรือ ชื่อหมอ ไหม
     return fullName.includes(search) || username.includes(search) || doctor.includes(search);
   });
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard-card" style={{ maxWidth: '1100px', width: '90%', minHeight: '90vh' }}>
+      {/* แก้ไข style ตรงนี้ให้เหมือนหน้า Login (ลดจาก 1100px เหลือ 800px) */}
+      <div className="dashboard-card" style={{ maxWidth: '800px', width: '70%', minHeight: '90vh' }}>
 
         {/* --- Header --- */}
         <div className="dashboard-header" style={{ paddingBottom: '0', borderBottom: 'none' }}>
@@ -99,11 +93,9 @@ export default function AdminDashboard() {
                     <tr key={item.id}>
                       <td style={{ textAlign: 'center', color: '#64748b' }}>{index + 1}</td>
                       
-                      {/* ✅ 3. การแสดงผลแบบ Safe Access */}
                       <td>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                            <span style={{ fontWeight: 'bold', color: '#334155' }}>
-                             {/* ใช้ ?. ป้องกันจอขาวถ้าไม่มี user */}
                              {item.user?.firstName || 'ไม่ระบุชื่อ'} {item.user?.lastName || ''}
                            </span>
                            <span style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '4px' }}>
